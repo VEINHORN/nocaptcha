@@ -1,25 +1,41 @@
 package com.github.veinhorn.nocaptcha.rest.api.v1.endpoints
 
-import akka.http.scaladsl.server.{Directives, Route}
-import com.github.veinhorn.nocaptcha.rest.Endpoint
+import akka.actor.ActorRef
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.server.Route
+import akka.pattern.ask
+import akka.util.Timeout
+import com.github.veinhorn.nocaptcha.rest.SecureEndpoint
+import com.github.veinhorn.nocaptcha.rest.api.v1.JsonSupport
+import com.github.veinhorn.nocaptcha.rest.core.producers.DataProducer.PublishMessage
+import com.github.veinhorn.nocaptcha.rest.core.producers.EventMessages.MessagePublished
 import com.github.veinhorn.nocaptcha.rest.models.Captcha
+import com.github.veinhorn.nocaptcha.rest.models.repositories.UserRepository
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
 /**
   * Created by VEINHORN on 16.05.2018.
   */
-class CaptchaEndpoint extends Endpoint {
+class CaptchaEndpoint(userRepo: UserRepository, dataProducer: ActorRef) extends SecureEndpoint with JsonSupport {
+  implicit val timeout = Timeout(10 seconds)
+
   override def routes: Route =
     pathPrefix("captchas") {
-      publishCaptcha
+      extractExecutionContext { implicit ec =>
+        basicAuth(ec, userRepo) { username =>
+          publishCaptcha
+        }
+      }
     }
 
-  def publishCaptcha: Route =
+  def publishCaptcha(implicit ec: ExecutionContext): Route =
     post {
       entity(as[Captcha]) { captcha =>
-        extractExecutionContext { implicit ec =>
-          onSuccess() {
-
-          }
+        onSuccess(dataProducer ? PublishMessage(captcha)) {
+          case MessagePublished => complete(OK, "ok")
+          case _ => complete(InternalServerError)
         }
       }
     }

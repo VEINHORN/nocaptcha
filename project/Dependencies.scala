@@ -10,6 +10,7 @@ object Dependencies {
   lazy val AkkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
 
   lazy val MongoScalaDriver = "org.mongodb.scala" %% "mongo-scala-driver" % "2.2.1"
+  lazy val KafkaStream = "com.typesafe.akka" %% "akka-stream-kafka" % "0.20"
 
   lazy val ScalaTest = "org.scalatest" %% "scalatest" % "3.0.5"
 }

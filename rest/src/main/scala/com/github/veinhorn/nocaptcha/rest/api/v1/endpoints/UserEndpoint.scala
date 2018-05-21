@@ -7,7 +7,6 @@ import com.github.veinhorn.nocaptcha.rest.BasicAuthenticator
 import com.github.veinhorn.nocaptcha.rest.api.v1.JsonSupport
 import com.github.veinhorn.nocaptcha.rest.models.User
 import com.github.veinhorn.nocaptcha.rest.models.repositories.UserRepository
-import org.bson.types.ObjectId
 import spray.json.{JsObject, JsString}
 
 /**

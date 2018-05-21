@@ -1,6 +1,5 @@
 package com.github.veinhorn.nocaptcha.rest.models
 
-import org.bson.types.ObjectId
 import org.mongodb.scala.bson.ObjectId
 
 /**
