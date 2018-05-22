@@ -28,7 +28,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   }
 
   implicit object CaptchaJsonFormat extends RootJsonFormat[Captcha] {
-    override def write(captcha: Captcha): JsValue = JsObject()
+    override def write(captcha: Captcha): JsValue = JsObject(
+      "data" -> JsString(captcha.data)
+    )
 
     override def read(json: JsValue): Captcha = {
       json.asJsObject.getFields("data") match {

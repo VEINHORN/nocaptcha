@@ -8,9 +8,10 @@ import akka.util.Timeout
 import com.github.veinhorn.nocaptcha.rest.SecureEndpoint
 import com.github.veinhorn.nocaptcha.rest.api.v1.JsonSupport
 import com.github.veinhorn.nocaptcha.rest.core.producers.DataProducer.PublishMessage
-import com.github.veinhorn.nocaptcha.rest.core.producers.EventMessages.MessagePublished
+import com.github.veinhorn.nocaptcha.rest.core.producers.EventMessages.CaptchaPublished
 import com.github.veinhorn.nocaptcha.rest.models.Captcha
 import com.github.veinhorn.nocaptcha.rest.models.repositories.UserRepository
+import spray.json.{JsObject, JsString}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -34,7 +35,8 @@ class CaptchaEndpoint(userRepo: UserRepository, dataProducer: ActorRef) extends 
     post {
       entity(as[Captcha]) { captcha =>
         onSuccess(dataProducer ? PublishMessage(captcha)) {
-          case MessagePublished => complete(OK, "ok")
+          case CaptchaPublished(key) =>
+            complete(Created, JsObject("captchaId" -> JsString(key)))
           case _ => complete(InternalServerError)
         }
       }

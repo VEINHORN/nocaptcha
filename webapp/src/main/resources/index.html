@@ -1,26 +1,50 @@
 <html>
     <head>
-        <title>Your app</title>
+        <title>Home</title>
+
+        <link rel="stylesheet" type="text/css" href="./app.css">
+
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
     </head>
 
     <body>
+        <div id="root">
+            
+        </div>
+
         <div id="container">
             <ul id="captchas">
 
             </ul>
         </div>
 
-        <script type = "text/javascript">
+        <!-- <script type = "text/javascript">
             var exampleSocket = new WebSocket("ws://10.57.31.112:5557/ws");
             var ul = document.getElementById("captchas");
 
             exampleSocket.onmessage = function (event) {
                 console.log(event.data);
 
+                var image = JSON.parse(event.data);
+
                 var li = document.createElement("li");
-                li.appendChild(document.createTextNode(event.data));
+
+                var img = document.createElement("img");
+                var srcAttr = document.createAttribute("src");
+                srcAttr.value = image.data;
+                
+
+                img.setAttributeNode(srcAttr);
+                img.classList.add("captcha-img");
+
+                li.appendChild(img);
+
                 ul.appendChild(li);
             }
-        </script>
+        </script> -->
+
+        <script src="./app.js" type="text/babel"></script>
     </body>
 </html>

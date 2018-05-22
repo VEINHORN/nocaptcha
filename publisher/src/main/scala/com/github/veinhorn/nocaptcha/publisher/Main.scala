@@ -17,15 +17,16 @@ import scala.util.Random
   * Created by VEINHORN on 18.05.2018.
   */
 object Main extends App {
-  val config = ConfigFactory.load
+  lazy val config = ConfigFactory.load
 
-  implicit val system = ActorSystem()
+  implicit val system = ActorSystem("publisher")
   implicit val materializer = ActorMaterializer()
 
-  val consumerStream = source("input_captchas")
-    .map { v => println(v.record.value()); v }
-    .map { v => TextMessage(new Random().nextString(5)) }
+  def consumerStream(topic: String) =
+    Consumer.atMostOnceSource(settings, Subscriptions.topics(topic))
+            .map(record => TextMessage(record.value()))
 
+  // Handle incoming WebSocket requests
   val handler =
     Flow[Message].mapConcat {
       case tm: TextMessage =>
@@ -36,7 +37,7 @@ object Main extends App {
         bm.dataStream.runWith(Sink.ignore)
         Nil
     }
-    .merge(consumerStream)
+    .merge(consumerStream("input_captchas"))
 
   val websocketRoute =
     path("ws") {
@@ -49,7 +50,4 @@ object Main extends App {
   def settings = ConsumerSettings(system, new ByteArrayDeserializer, new StringDeserializer)
     .withBootstrapServers("localhost:9092")
     .withGroupId("publishers")
-
-  def source(topic: String) =
-    Consumer.committableSource(settings, Subscriptions.topics(topic))
 }

@@ -16,6 +16,9 @@ object Main extends App {
   implicit val materializer = ActorMaterializer()
 
   val routes = get {
+    path(Segment) { resource =>
+      getFromResource(resource)
+    } ~
     getFromResource("index.html", ContentTypes.`text/html(UTF-8)`)
   }
 

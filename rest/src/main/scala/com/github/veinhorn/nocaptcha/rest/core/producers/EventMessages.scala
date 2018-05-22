@@ -10,5 +10,9 @@ object EventMessages {
 
   case class ActivatedProducerStream[T](producerStream: SourceQueueWithComplete[T]) extends EventMessage
 
-  case object MessagePublished extends EventMessage
+  /**
+    * Event which means that captcha was successfully published to the Kafka
+    * @param key is the unique key of captcha
+    */
+  case class CaptchaPublished(key: String) extends EventMessage
 }
