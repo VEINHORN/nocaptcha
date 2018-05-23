@@ -6,13 +6,6 @@ wSocket.onmessage = function (event) {
 	console.log("received message");
 }
 
-const name = 'Josh Perez';
-const element = (
-	<ul id="captchas">
-		
-	</ul>
-);
-
 function CaptchaContainer(props) {
 	return (
 		<ul id="captchas">
