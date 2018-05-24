@@ -10,42 +10,9 @@
     </head>
 
     <body>
-        <p>ttt</p>
-
-        <div id="root">
+        <div id="app">
             
         </div>
-
-        <div id="container">
-            <ul id="captchas">
-
-            </ul>
-        </div>
-
-        <!-- <script type = "text/javascript">
-            var exampleSocket = new WebSocket("ws://10.57.31.112:5557/ws");
-            var ul = document.getElementById("captchas");
-
-            exampleSocket.onmessage = function (event) {
-                console.log(event.data);
-
-                var image = JSON.parse(event.data);
-
-                var li = document.createElement("li");
-
-                var img = document.createElement("img");
-                var srcAttr = document.createAttribute("src");
-                srcAttr.value = image.data;
-                
-
-                img.setAttributeNode(srcAttr);
-                img.classList.add("captcha-img");
-
-                li.appendChild(img);
-
-                ul.appendChild(li);
-            }
-        </script> -->
 
         <script src="./app.js" type="text/babel"></script>
     </body>

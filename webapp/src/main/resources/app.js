@@ -1,36 +1,91 @@
-const wSocket = new WebSocket("ws://10.57.31.112:5557/ws");
+class CaptchaApp extends React.Component {
+	constructor(props) {
+		super(props);
+		this.removeCaptchaItem = this.removeCaptchaItem.bind(this);
 
-var captchas = ["1", "2"];
+		this.state = { captchas: [] };
+	}
 
-wSocket.onmessage = function (event) {
-	console.log("received message");
-}
+	componentDidMount() {
+		this.ws = new WebSocket("ws://10.57.31.112:5557/ws");
+		this.ws.onmessage = e => {
+			console.log("Received ws message!");
 
-function CaptchaContainer(props) {
-	return (
-		<ul id="captchas">
-			{
-				props.items.map((item, index) => (
-					<li key={index}>
-						<CaptchaItem image={item} />
-					</li>
-				))
-			}
-		</ul>
-	);
-}
+			const json = JSON.parse(e.data);
+			const newCaptcha = [ { "data": json.data, "publisherId": json.publisherId } ];
 
-class CaptchaItem extends React.Component {
+			this.setState((prevState, props) => ({
+				captchas: prevState.captchas.concat(newCaptcha)
+			}));
+		}
+
+		console.log("Here we should send initial request to the server!");
+	}
+
+	componentWillUnmount() {
+		this.ws.close();
+	}
+
+	removeCaptchaItem(index) {
+		console.log("removed captcha item");
+	}
+
 	render() {
 		return (
-			<div>
-				<img className="captcha-img" src={this.props.image} />
-			</div>
-		);
+			<CaptchaList items={this.state.captchas}
+			             removeCaptchaItem={this.removeCaptchaItem} />
+		)
+	}
+}
+
+class CaptchaList extends React.Component {
+	render() {
+		return (
+			<ul id="captchas">
+				{
+					this.props.items.map((item, index) => (
+						<CaptchaListItem key={index}
+						index={index}
+						item={item}
+						removeItem={this.props.removeCaptchaItem} />
+					))
+				}
+			</ul>
+		)
+	}
+}
+
+class CaptchaListItem extends React.Component {
+	constructor(props) {
+		super(props);
+		this.onSendClick = this.onSendClick.bind(this);
+	}
+
+	onSendClick() {
+		console.log("Clicked on Send button!");
+	}
+
+	render() {
+		return (
+			<li>
+				<div className="captcha-item">
+					<div>
+						<img className="captcha-img" src={this.props.item.data} />
+					</div>
+
+					<div className="captcha-control">
+						<label htmlFor="recognized">Recognize captcha:</label>
+						<input type="text" id="recognized" />
+						<input type="submit" value="Send" onClick={this.onSendClick} />
+						<p>Published by: {this.props.item.publisherId}</p>
+					</div>
+				</div>
+			</li>
+		)
 	}
 }
 
 ReactDOM.render(
-    <CaptchaContainer items={captchas} />,
-    document.getElementById('root')
+    <CaptchaApp />,
+    document.getElementById('app')
 );
