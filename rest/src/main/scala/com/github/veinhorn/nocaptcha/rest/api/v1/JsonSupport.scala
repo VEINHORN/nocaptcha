@@ -29,12 +29,14 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit object CaptchaJsonFormat extends RootJsonFormat[Captcha] {
     override def write(captcha: Captcha): JsValue = JsObject(
+      "publisherId" -> JsString(captcha.publisherId),
+      "captchaId" -> JsString(captcha.key),
       "data" -> JsString(captcha.data)
     )
 
     override def read(json: JsValue): Captcha = {
       json.asJsObject.getFields("data") match {
-        case Seq(JsString(data)) => Captcha(data)
+        case Seq(JsString(data)) => Captcha(null, data) // TODO: Fix null passing, maybe replace with Option[String]
         case _ => throw DeserializationException("missing some of the captcha data")
       }
     }

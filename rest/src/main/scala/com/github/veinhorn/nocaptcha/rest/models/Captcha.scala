@@ -6,7 +6,9 @@ import java.util.{Date, UUID}
   * Created by VEINHORN on 16.05.2018.
   */
 object Captcha {
-  def apply(data: String): Captcha = Captcha(data, new Date())
+  val DataLengthLimit = 50
+
+  def apply(publisherId: String, data: String): Captcha = Captcha(publisherId, data, new Date())
 }
 
 /**
@@ -15,4 +17,11 @@ object Captcha {
   * @param created date of captcha
   * @param key is the unique key for this captcha
   */
-case class Captcha(data: String, created: Date, key: String = UUID.randomUUID().toString)
+case class Captcha(publisherId: String,
+                   data: String,
+                   created: Date,
+                   key: String = UUID.randomUUID().toString) {
+  import Captcha.DataLengthLimit
+
+  override def toString = s"Captcha(publisherId: $publisherId, data: ${data.take(DataLengthLimit)}..., created: $created, key: $key)"
+}

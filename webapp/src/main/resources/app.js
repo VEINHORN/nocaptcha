@@ -2,6 +2,7 @@ class CaptchaApp extends React.Component {
 	constructor(props) {
 		super(props);
 		this.removeCaptchaItem = this.removeCaptchaItem.bind(this);
+		this.sendCaptcha = this.sendCaptcha.bind(this);
 
 		this.state = { captchas: [] };
 	}
@@ -12,7 +13,13 @@ class CaptchaApp extends React.Component {
 			console.log("Received ws message!");
 
 			const json = JSON.parse(e.data);
-			const newCaptcha = [ { "data": json.data, "publisherId": json.publisherId } ];
+			const newCaptcha = [
+				{
+					"data": json.data,
+					"publisherId": json.publisherId,
+					"captchaId": json.captchaId
+				}
+			];
 
 			this.setState((prevState, props) => ({
 				captchas: prevState.captchas.concat(newCaptcha)
@@ -27,13 +34,26 @@ class CaptchaApp extends React.Component {
 	}
 
 	removeCaptchaItem(index) {
-		console.log("removed captcha item");
+		console.log("captchas=" + JSON.stringify(this.state.captchas));
+
+		this.setState((prevState, props) => {
+			prevState.captchas.splice(index, 1);
+			const captchas = prevState.captchas.slice();
+			return { captchas: captchas }
+		});
+	}
+
+	sendCaptcha(captcha) {
+		console.log("Trying to send captcha...");
+
+		this.ws.send(JSON.stringify(captcha));
 	}
 
 	render() {
 		return (
 			<CaptchaList items={this.state.captchas}
-			             removeCaptchaItem={this.removeCaptchaItem} />
+			             removeCaptchaItem={this.removeCaptchaItem}
+			             sendCaptcha={this.sendCaptcha} />
 		)
 	}
 }
@@ -45,9 +65,10 @@ class CaptchaList extends React.Component {
 				{
 					this.props.items.map((item, index) => (
 						<CaptchaListItem key={index}
-						index={index}
-						item={item}
-						removeItem={this.props.removeCaptchaItem} />
+										 index={index}
+										 item={item}
+										 removeCaptchaItem={this.props.removeCaptchaItem}
+										 sendCaptcha={this.props.sendCaptcha} />
 					))
 				}
 			</ul>
@@ -62,7 +83,12 @@ class CaptchaListItem extends React.Component {
 	}
 
 	onSendClick() {
-		console.log("Clicked on Send button!");
+		const index = parseInt(this.props.index);
+		this.props.removeCaptchaItem(index);
+		
+		const captcha = { data: "some data" };
+
+		this.props.sendCaptcha(captcha);
 	}
 
 	render() {
@@ -78,6 +104,8 @@ class CaptchaListItem extends React.Component {
 						<input type="text" id="recognized" />
 						<input type="submit" value="Send" onClick={this.onSendClick} />
 						<p>Published by: {this.props.item.publisherId}</p>
+						<p>Captcha id: {this.props.item.captchaId}</p>
+						<p>Index: {this.props.index}</p>
 					</div>
 				</div>
 			</li>

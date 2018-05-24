@@ -1,6 +1,7 @@
 package com.github.veinhorn.nocaptcha.rest.api.v1.endpoints
 
 import akka.actor.ActorRef
+import akka.event.LoggingAdapter
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
@@ -25,19 +26,23 @@ class CaptchaEndpoint(userRepo: UserRepository, dataProducer: ActorRef) extends 
   override def routes: Route =
     pathPrefix("captchas") {
       extractExecutionContext { implicit ec =>
-        basicAuth(ec, userRepo) { username =>
-          publishCaptcha
+        extractLog { implicit log =>
+          basicAuth(ec, userRepo) { username =>
+            publishCaptcha(username)
+          }
         }
       }
     }
 
-  def publishCaptcha(implicit ec: ExecutionContext): Route =
+  def publishCaptcha(userId: String)(implicit ec: ExecutionContext, log: LoggingAdapter): Route =
     post {
       entity(as[Captcha]) { captcha =>
-        onSuccess(dataProducer ? PublishMessage(captcha)) {
-          case CaptchaPublished(key) =>
-            complete(Created, JsObject("captchaId" -> JsString(key)))
-          case _ => complete(InternalServerError)
+        val enrichedCaptcha = captcha.copy(publisherId = userId)
+        log.info(s"Received captcha=$enrichedCaptcha")
+
+        onSuccess(dataProducer ? PublishMessage(enrichedCaptcha)) {
+          case CaptchaPublished(key) => complete(Created, JsObject("captchaId" -> JsString(key)))
+          case _                     => complete(InternalServerError)
         }
       }
     }

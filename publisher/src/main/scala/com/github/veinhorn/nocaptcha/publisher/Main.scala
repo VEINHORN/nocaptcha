@@ -30,8 +30,9 @@ object Main extends App {
   val handler =
     Flow[Message].mapConcat {
       case tm: TextMessage =>
-        println("received text")
-        TextMessage("some response") :: Nil
+        TextMessage.Strict
+        println(s"received text=${tm.getStrictText}")
+        Nil
       case bm: BinaryMessage =>
         println("received binary")
         bm.dataStream.runWith(Sink.ignore)
