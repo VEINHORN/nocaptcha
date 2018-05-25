@@ -11,8 +11,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink}
 import org.apache.kafka.common.serialization.{ByteArrayDeserializer, StringDeserializer}
 
-import scala.util.Random
-
 /**
   * Created by VEINHORN on 18.05.2018.
   */
@@ -25,6 +23,7 @@ object Main extends App {
   def consumerStream(topic: String) =
     Consumer.atMostOnceSource(settings, Subscriptions.topics(topic))
             .map(record => TextMessage(record.value()))
+
 
   // Handle incoming WebSocket requests
   val handler =

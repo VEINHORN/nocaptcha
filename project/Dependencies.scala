@@ -6,6 +6,7 @@ object Dependencies {
 
   lazy val AkkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
   lazy val AkkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
+  lazy val AkkaPersistence = "com.typesafe.akka" %% "akka-persistence" % AkkaVersion
   lazy val AkkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
   lazy val AkkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
 

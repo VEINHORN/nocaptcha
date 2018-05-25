@@ -48,6 +48,7 @@ lazy val publisher = (project in file("publisher"))
     version := "0.0.1",
     libraryDependencies ++= Seq(
       AkkaHttp,
+      AkkaPersistence,
       KafkaStream
     )
   )
